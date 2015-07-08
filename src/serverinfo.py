@@ -36,6 +36,7 @@ class serverinfo(object):
         self.host = ""
         self.nonsslport = 80
         self.sslport = 443
+        self.path = ""
         self.afunix = None
         self.host2 = ""
         self.nonsslport2 = 80
@@ -170,6 +171,8 @@ class serverinfo(object):
                 self.sslport = int(child.text)
             elif child.tag == src.xmlDefs.ELEMENT_UNIX:
                 self.afunix = child.text
+            elif child.tag == src.xmlDefs.ELEMENT_PATH:
+                self.path = child.text
             elif child.tag == src.xmlDefs.ELEMENT_HOST2:
                 try:
                     self.host2 = child.text.encode("utf-8")

@@ -148,6 +148,7 @@ class request(object):
         self.manager = manager
         self.host = self.manager.server_info.host
         self.port = self.manager.server_info.port
+        self.path = self.manager.server_info.path
         self.afunix = self.manager.server_info.afunix
         self.auth = True
         self.user = ""
@@ -197,6 +198,7 @@ class request(object):
         elif "##" in uri:
             if "?" not in uri or uri.find("?") > uri.find("##"):
                 uri = uri.replace("##", str(self.count))
+	uri = self.path + uri
         return uri
 
 

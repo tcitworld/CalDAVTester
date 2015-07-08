@@ -168,6 +168,9 @@ class manager(object):
         moresubs["$hostssl:"] = "https://%s" % (self.server_info.host,)
         if self.server_info.sslport != 443:
             moresubs["$hostssl:"] += ":%d" % (self.server_info.sslport,)
+        if self.server_info.path != "":
+            moresubs["$host:"] += self.server_info.path
+            moresubs["$hostssl:"] += self.server_info.path
 
         moresubs["$host2:"] = "%s://%s" % (
             "https" if ssl else "http",

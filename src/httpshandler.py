@@ -37,7 +37,6 @@ class HTTPSVersionConnection(httplib.HTTPSConnection):
 
 cached_types = (
     (set(), sslmodule.PROTOCOL_TLSv1),
-    (set(), sslmodule.PROTOCOL_SSLv3),
     (set(), sslmodule.PROTOCOL_SSLv23),
 )
 
