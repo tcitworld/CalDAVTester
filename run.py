@@ -27,46 +27,38 @@ import sys
 cwd = os.getcwd()
 top = cwd[:cwd.rfind("/")]
 add_paths = []
-svn = "/usr/bin/svn"
-uri_base = "http://svn.calendarserver.org/repository/calendarserver"
+git = "/usr/bin/git"
+uri_base = "https://github.com/apple"
 
 packages = [
-    ("pycalendar", "pycalendar/src", uri_base + "/PyCalendar/trunk", "HEAD"),
+    ("pycalendar", "ccs-pycalendar", uri_base + "/ccs-pycalendar", "ccs-pycalendar/src"),
 ]
 
 def usage():
-    print """Usage: run.py [options]
+    print ("""Usage: run.py [options]
 Options:
     -h       Print this help and exit
     -s       Do setup only - do not run any tests
     -r       Run tests only - do not do setup
     -p       Print PYTHONPATH
-"""
+""")
 
 
 
 def setup():
     for package in packages:
-        ppath = "%s/%s" % (top, package[0],)
+        ppath = "%s/%s" % (top, package[1],)
         if not os.path.exists(ppath):
-            print "%s package is not present." % (package[0],)
-            os.system("%s checkout -r %s %s@%s %s" % (svn, package[3], package[2], package[3], ppath,))
+            print("%s package is not present." % (package[0],))
+            os.system("%s clone %s %s" % (git, package[2], ppath))
         else:
-            print "%s package is present." % (package[0],)
-            fd = os.popen("%s info ../%s --xml" % (svn, package[0],))
-            line = fd.read()
-            wc_url = line[line.find("<url>") + 5:line.find("</url>")]
-            if wc_url != package[2]:
-                print "Current working copy (%s) is from the wrong URI: %s != %s, switching..." % (ppath, wc_url, package[2],)
-                os.system("%s switch -r %s %s %s" % (svn, package[3], package[2], ppath,))
-            else:
-                rev = line[line.find("revision=\"") + 10:]
-                rev = rev[:rev.find("\"")]
-                if rev != package[3]:
-                    print "Updating %s..." % (package[0],)
-                    os.system("%s update -r %s %s" % (svn, package[3], ppath,))
+            print ("%s package is present." % (package[0],))
+            os.system("%s fetch origin" % (git))
+            reslog=os.popen("%s log HEAD..origin/master --oneline" % (git)).read()
+            if reslog != "":
+              os.system("%s merge origin/master" % (git))
 
-        add_paths.append("%s/%s" % (top, package[1],))
+        add_paths.append("%s/%s" % (top, package[3],))
 
 
 
@@ -98,20 +90,20 @@ if __name__ == "__main__":
                 usage()
                 sys.exit(0)
             elif option == "-p":
-                print pythonpath()
+                print(pythonpath())
                 sys.exit(0)
             elif option == "-r":
                 do_setup = False
             elif option == "-s":
                 do_run = False
             else:
-                print "Unrecognized option: %s" % (option,)
+                print("Unrecognized option: %s" % (option,))
                 usage()
                 raise ValueError
 
         # Process arguments
         if len(args) != 0:
-            print "No arguments allowed."
+            print("No arguments allowed.")
             usage()
             raise ValueError
 
@@ -123,7 +115,7 @@ if __name__ == "__main__":
             sys.exit(runit())
         else:
             sys.exit(0)
-    except SystemExit, e:
+    except SystemExit as e:
         pass
-    except Exception, e:
+    except Exception as e:
         sys.exit(str(e))
